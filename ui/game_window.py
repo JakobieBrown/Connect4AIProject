@@ -4,15 +4,15 @@ from config import BOARD_WIDTH, BOARD_HEIGHT, CELL_SIZE
 from ui.input_handler import InputHandler
 
 class GameWindow:    
-    def __init__(self):
+    def __init__(self, fps):
         # - initializing pygame https://www.pygame.org/docs/
         pygame.init()
-        
+        self.fps = fps
         self.width = (BOARD_WIDTH * CELL_SIZE)
         self.height = (BOARD_HEIGHT * CELL_SIZE + CELL_SIZE)  # extra space for column/turn indicator
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Connect Four")
-        
+        self.clock = pygame.time.Clock()
         self.running = True
         
         self.board_renderer = BoardRenderer(self.screen)
@@ -42,7 +42,6 @@ class GameWindow:
 
 
     def render_indicator(self, player):
-        print(self.hovered_col)
         self.board_renderer.draw_column_indicator(self.hovered_col, player)
         
     def render_results(self, winner):
@@ -55,6 +54,7 @@ class GameWindow:
 
     def update(self):
         # - update pygame display https://www.pygame.org/docs/ref/display.html#pygame.display.flip
+        self.clock.tick(self.fps)
         pygame.display.flip()
 
     def close(self):
