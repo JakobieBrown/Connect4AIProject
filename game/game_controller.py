@@ -18,6 +18,12 @@ class GameController:
             self.winner = 0
         else:
             self.current_player = (self.current_player % 2) + 1
+
+    # def revert_move(self, col):
+    #     self.board.undo_move(col)
+    #     self.game_over = False
+    #     self.winner = None
+    #     self.current_player = (self.current_player % 2) + 1
             
     def check_win(self, col, player):
         # Get the row where the piece was placed
@@ -63,3 +69,28 @@ class GameController:
         self.current_player = 1
         self.game_over = False
         self.winner = None
+
+    def is_valid_move(self, col):
+        return self.board.is_valid_move(col)
+    
+    def get_valid_moves(self):
+        return self.board.get_valid_moves()
+    
+    def get_heights(self):
+        return self.board.get_heights()
+
+    def get_successor(self, col):
+        successor = GameController()
+        successor.current_player = self.current_player
+        successor.game_over = self.game_over
+        successor.winner = self.winner
+        successor.board = Board(self.board.width,self.board.height)
+        successor.board.column_heights = self.board.get_heights()
+        successor.board.grid = self.board.get_grid()
+        successor.process_move(col)
+        return successor
+
+    def get_hash(self):
+        return str(self.current_player) + self.board.get_hash()        
+            
+            
