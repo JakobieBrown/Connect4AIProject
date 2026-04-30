@@ -90,6 +90,9 @@ class GameController:
         successor.process_move(col)
         return successor
 
+    def get_board(self):
+        return self.board.get_grid()
+    
     def get_hash(self):
         return str(self.current_player) + self.board.get_hash()        
             
