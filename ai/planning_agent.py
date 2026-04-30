@@ -1,4 +1,5 @@
 import random 
+from config import BOARD_WIDTH, BOARD_HEIGHT, WINNING_NUMBER
 class PlanningAgent:
     def __init__(self):
         self.eval_look_up = dict()
@@ -15,12 +16,11 @@ class PlanningAgent:
         beta = float("inf")
         is_maximizing = game_state.current_player == 1
         best = float("-inf") if is_maximizing else float("inf")
-        #valid_moves = self.prioritize_queue(game_state, game_state.get_valid_moves())
         valid_moves = game_state.get_valid_moves()
         best_move = valid_moves[0]
         for move in valid_moves:
             successor_state = game_state.get_successor(move)
-            value = self.MiniMaxValue(successor_state,depth -1,alpha,beta)
+            value = self.MiniMaxValue(successor_state,depth -1,alpha,beta, not is_maximizing)
             if is_maximizing:
                 if value > best:
                     best = value
@@ -34,17 +34,14 @@ class PlanningAgent:
             if beta <= alpha:
                 break
         return best_move    
-    
 
-
-    def MiniMaxValue(self, game_state, depth, alpha, beta):
+    def MiniMaxValue(self, game_state, depth, alpha, beta, is_maximizing):
         if depth == 0 or game_state.game_over:
             return self.evaluation_function(game_state)
-        is_maximizing = game_state.current_player == 1
         best = float("-inf") if is_maximizing else float("inf")
         for move in game_state.get_valid_moves():
             successor_state = game_state.get_successor(move)
-            value = self.MiniMaxValue(successor_state, depth-1,alpha, beta)
+            value = self.MiniMaxValue(successor_state, depth-1,alpha, beta, not is_maximizing)
             if is_maximizing:
                 best = max(best,value)
                 alpha = max(alpha, best) 
@@ -57,8 +54,7 @@ class PlanningAgent:
 
     def evaluation_function(self, game_state):
         return self.evaluate_state(game_state)
-        
-        
+    
     def evaluate_state(self, game_state):
         if game_state.game_over:
             match(game_state.winner):
@@ -100,19 +96,18 @@ class PlanningAgent:
             self.eval_look_up[hash] = eval
             return eval
         
+
     def evaluate_board(self, game_state):
-        # Add board evaluation Logic here
-        return 0
-
-    def prioritize_queue(self, game_state, moves):
-        ls = []
-        for col in moves:
-            row = game_state.get_heights()[col]
-            ls.append({'move':col, 'priority':self.heat_map[row][col]})
-        ls.sort(key=lambda x: x["priority"], reverse=True)
-        return [x["move"] for x in ls]
-
-
+        sum = 0
+        board = game_state.get_board()
+        for r in range(BOARD_HEIGHT):
+            for c in range(BOARD_WIDTH):
+                if board[r][c] == 1:
+                    sum += self.heat_map[r][c]
+                elif board[r][c] == 2:
+                    sum -= self.heat_map[r][c]
+        return sum
+    
         
     def get_move(self, controller, depth):
         self.move = self.MiniMax(controller, depth)
