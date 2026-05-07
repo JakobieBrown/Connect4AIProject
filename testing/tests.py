@@ -131,6 +131,5 @@ class TestTool:
         if legend_handles:
             ax4.legend(handles=legend_handles, loc="upper right", fontsize=8)
 
-        plt.savefig("agent_performance.png", dpi=150, bbox_inches="tight")
         plt.show()
 
