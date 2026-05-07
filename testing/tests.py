@@ -52,6 +52,7 @@ class TestTool:
                                              }
     
     @staticmethod
+
     def plot_results(): # Function provided by Claude AI
         if not TestTool.results:
             print("No results to plot.")
@@ -128,6 +129,7 @@ class TestTool:
             plt.Rectangle((0, 0), 1, 1, color=color_map[w], label=f"Player {w}")
             for w in unique_winners
         ]
+        legend_handles[0].set_label("Draw")
         if legend_handles:
             ax4.legend(handles=legend_handles, loc="upper right", fontsize=8)
 
