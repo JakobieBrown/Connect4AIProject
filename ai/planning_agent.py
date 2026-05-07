@@ -1,15 +1,17 @@
 import random 
 from config import BOARD_WIDTH, BOARD_HEIGHT, WINNING_NUMBER
+from testing.tests import TestTool
+
 class PlanningAgent:
     def __init__(self):
         self.eval_look_up = dict()
         self.move = None
-        self.heat_map = [[3,4,5,7,5,4,3],
-                         [4,6,8,10,8,6,4], 
-                         [5,8,11,13,11,8,5],
-                         [5,8,11,13,11,8,5],
-                         [4,6,8,10,8,6,4],
-                         [3,4,5,7,5,4,3]]
+        self.heat_map = [[  3,  4,  5,  7,  5,  4,  3],
+                         [  4,  6,  8, 10,  8,  6,  4], 
+                         [  5,  8, 11, 13, 11,  8,  5],
+                         [  5,  8, 11, 13, 11,  8,  5],
+                         [  4,  6,  8, 10,  8,  6,  4],
+                         [  3,  4,  5,  7,  5,  4,  3]]
 
     def MiniMax(self, game_state, depth):
         alpha = float("-inf")
@@ -36,7 +38,9 @@ class PlanningAgent:
         return best_move    
 
     def MiniMaxValue(self, game_state, depth, alpha, beta, is_maximizing):
-        if depth == 0 or game_state.game_over:
+        if depth <= 0 or game_state.game_over:
+            if game_state.game_over:
+                TestTool.set_winner(game_state.winner)
             return self.evaluation_function(game_state)
         best = float("-inf") if is_maximizing else float("inf")
         for move in game_state.get_valid_moves():
@@ -65,32 +69,36 @@ class PlanningAgent:
                 case _:
                     return 0
         else:
+            TestTool.increment_evaluated()
             eval = self.get_board_evaluation(game_state)
             return eval
         
     def get_board_evaluation(self, game_state):
 
         def mirror(hash):
-            '''the hash is 43 chars in length
-            [0] indicates the player
-            [1]-[42] indicates the elemenents in a grid
-            [1]-[6] 0th column
-            [7]-[12] 1st column
-            [13]-[18] 2nd column
-            [19]-[24] 3rd column
-            [25]-[30] 4th column
-            [31]-[36] 5th column
-            [37]-[42] 6th column
+            '''the hash is 42 chars in length
+            [0]-[41] indicates the elemenents in a grid
+            [0]-[5] 0th column
+            [6]-[11] 1st column
+            [12]-[17] 2nd column
+            [18]-[23] 3rd column
+            [24]-[29] 4th column
+            [30]-[35] 5th column
+            [36]-[41] 6th column
             '''
-            m_hash = hash[:1]
+            m_hash = ""
             for i in range(6,-1,-1): #loops in reverse
-                m_hash = m_hash + hash[(6*i):(6*i+6)+1] #builds string from slices
+                m_hash = m_hash + hash[(6*i):(6*i+6)] #builds string from slices
             return m_hash
-        
+        hash = game_state.get_hash()
         try:
-            return self.eval_look_up[hash]
+            result = self.eval_look_up[hash]
+            TestTool.increment_accessed()
+            return result
         except KeyError:
-            return self.eval_look_up[mirror(hash)]
+            result = self.eval_look_up[mirror(hash)]
+            TestTool.increment_accessed()
+            return result
         finally:
             eval = self.evaluate_board(game_state)
             self.eval_look_up[hash] = eval

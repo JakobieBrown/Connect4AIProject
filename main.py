@@ -5,6 +5,7 @@ from ai.aiconfig import AIConfig
 from ai.planning_agent import PlanningAgent
 import argparse
 import threading
+from testing.tests import TestTool
 
 
 # -- Parsing command line arguments https://docs.python.org/3/library/argparse.html
@@ -15,16 +16,16 @@ def parse_arguments():
     )
     parser.add_argument('--player1', action='store_true')
     parser.add_argument('--player2', action='store_true')
-    parser.add_argument('--ai-depth', type=int, default=5)
+    parser.add_argument('--depth', type=int, default=5)
     parser.add_argument('--fps', type=int, default=30)
+    parser.add_argument('--test', action='store_true')
     
     args = parser.parse_args()
     
-    return AIConfig(args.player1, args.player2), args.ai_depth, args.fps
+    return AIConfig(args.player1, args.player2), args.depth, args.fps, args.test
 
 
-def main():
-    ai_config, ai_depth, fps = parse_arguments()
+def main(ai_config, ai_depth, fps, testing = False):
     window = GameWindow(fps)
     controller = GameController()
     ai_agent = PlanningAgent()
@@ -47,7 +48,6 @@ def main():
             else:
                 if window.selected_col is not None and controller.board.is_valid_move(window.selected_col):
                     controller.process_move(window.selected_col)
-            
 
         window.render_board(controller.board.get_grid())
         if not controller.game_over:
@@ -55,7 +55,20 @@ def main():
                 window.render_indicator(controller.current_player)
         else:
             window.render_results(controller.winner)
+            if testing: window.running = False
         window.update()
 
 if __name__ == "__main__":
-    main()
+    ai_config, ai_depth, fps, testing = parse_arguments()
+    if testing:
+        ai_config = AIConfig(True,True)
+        for i in range(1,ai_depth+1):
+            TestTool.reset()
+            TestTool.set_depth(i)
+            TestTool.start_timer()
+            main(ai_config, i, fps, testing)
+            TestTool.end_timer()
+            TestTool.save_results()
+        TestTool.plot_results()
+    else:
+        main(ai_config, ai_depth, fps)
