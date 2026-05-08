@@ -21,7 +21,7 @@ The program has two modes: **game mode** and **test mode**.
 Run a game with any combination of human and AI players.
 
 ```bash
-python main.py [--player1] [--player2] [--fps FPS] [--depth DEPTH]
+python main.py --player1 --player2 --fps FPS --depth DEPTH
 ```
 
 By default, both players are human-controlled. Pass `--player1` and/or `--player2` to hand control of that player over to the AI agent.
@@ -47,7 +47,7 @@ python main.py --player1 --player2 --fps 30 --depth 4
 Run automated tests of the AI agent playing against itself.
 The tests will collect metrics from full games at every depth up to the supplied depth.
 ```bash
-python main.py --test [--depth DEPTH]
+python main.py --test --depth DEPTH
 ```
 
 **Example:**
